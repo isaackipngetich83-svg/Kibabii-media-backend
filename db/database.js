@@ -1,7 +1,11 @@
 const Database = require('better-sqlite3')
 const path     = require('path')
 
-const DB_PATH = path.join(__dirname, '..', 'kibucu.db')
+// On platforms with a persistent volume (e.g. Railway), set DB_DIR to the
+// mounted volume path (e.g. /data) so the database survives redeploys.
+const DB_PATH = process.env.DB_DIR
+  ? path.join(process.env.DB_DIR, 'kibucu.db')
+  : path.join(__dirname, '..', 'kibucu.db')
 const db      = new Database(DB_PATH)
 
 // WAL mode gives much better concurrent read performance.
