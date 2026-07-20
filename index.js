@@ -5,7 +5,20 @@ const cors        = require('cors')
 
 const app = express()
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://127.0.0.1:5173'] }))
+const defaultOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173']
+const envOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean)
+const allowedOrigins = envOrigins.length ? envOrigins : defaultOrigins
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (curl, server-to-server, mobile apps)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true)
+    callback(new Error(`CORS blocked for origin: ${origin}`))
+  }
+}))
 app.use(express.json())
 
 // ── Routes ────────────────────────────────────────────────────
