@@ -21,6 +21,13 @@ app.use(cors({
 }))
 app.use(express.json())
 
+// ── Health check ──────────────────────────────────────────────
+// Registered before the routes below so it isn't caught by the
+// auth middleware inside routes/misc.js (which is mounted at /api).
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, message: 'Kibucu API is running.' })
+})
+
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/auth',         require('./routes/auth'))
 app.use('/api/members',      require('./routes/members'))
@@ -30,11 +37,6 @@ app.use('/api/attendance',   require('./routes/attendance'))
 app.use('/api/lineups',      require('./routes/lineups'))
 app.use('/api/inbox',        require('./routes/inbox'))
 app.use('/api',              require('./routes/misc'))   // /api/roles + /api/slots
-
-// ── Health check ──────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, message: 'Kibucu API is running.' })
-})
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use((req, res) => {
